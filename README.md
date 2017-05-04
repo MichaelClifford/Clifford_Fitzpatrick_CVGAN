@@ -15,7 +15,7 @@ requirments.txt - A list of the required python packages need to recreate the en
 
 main_mine.lua - Torch code built by Vondirck to train the CVGAN our project is based on with updates made by our team to train on the UCF-101 data set. 
 
-generator.lua -  Torch code built by Vondrick used for testing, evaluating our outputs and generating videos trained with main_mine.Lua
+generator.lua -  Torch code built by Vondrick used for testing, evaluating our outputs and generating videos trained with main_mine.lua
 
 ## Run Code
 
