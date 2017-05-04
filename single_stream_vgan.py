@@ -471,5 +471,5 @@ if __name__ == '__main__':
 	for i in range(num_frames):
 		frame = imageio.imwrite('frame.jpg', np.squeeze(out)[:,:,i,:])
 		gif_frame_list.append(imageio.imread('frame.jpg'))
-		imageio.mimsave('test3.gif', gif_frame_list)
+		imageio.mimsave('out_put_video.gif', gif_frame_list)
 
