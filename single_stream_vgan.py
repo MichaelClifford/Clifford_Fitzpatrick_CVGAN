@@ -1,9 +1,8 @@
 import numpy as np
-#from numpy.random import randint
 import random
 import linecache
 import time
-import imageio
+import imageio # for saving gifs
 
 
 from keras.models import Sequential
@@ -20,6 +19,9 @@ import tensorflow as tf
 
 
 class ElapsedTimer(object):
+	'''
+	This implements a timer to keep track of training time.
+	'''
 	def __init__(self):
 		self.start_time = time.time()
 	def elapsed(self,sec):
@@ -33,6 +35,9 @@ class ElapsedTimer(object):
 		print("Elapsed: %s " % self.elapsed(time.time() - self.start_time) )
 
 class VGAN(object):
+	'''
+	This class implements the generator, discriminator, and the GAN networks, independent of dataset.
+	'''
 	def __init__(self, vid_rows=64, vid_cols=64, num_frames=32, channels=3):
 		self.vid_rows = vid_rows
 		self.vid_cols = vid_cols
@@ -45,6 +50,11 @@ class VGAN(object):
 		self.input_shape = (self.vid_rows, self.vid_cols, self.num_frames, self.channels)
 
 	def discriminator(self):
+		'''
+		This is the discriminator. 
+		It's a 5 layer 3dconvolutional binary classifier 
+		with batch normalization and leaky relu activations.
+		'''
 		if self.D:
 			return self.D
 
@@ -111,6 +121,11 @@ class VGAN(object):
 
 
 	def generator(self):
+		'''
+		This is the constructor of the generator. It combines the _video() stream
+		and the _static() streams with the _mask(). It uses the helper function _gen_net()
+		because the foreground (video) stream forks before completion.
+		'''
 		if self.G:
 			return self.G
 			
@@ -188,6 +203,9 @@ class VGAN(object):
 		return static
 
 	def _video(self): # make the generator the only stream. 
+		'''
+		The foreground stream. It learns the dynamics in the foreground.
+		'''
 		video = Sequential()
 		video.add(Deconvolution3D(filters=512,output_shape =(None,4,4,2,512),
 							kernel_size=(4,4,2),
@@ -312,6 +330,12 @@ class VGAN(object):
 		return self.AM
 
 class UCF_VGAN(object):
+	'''
+	Uses the adversarial model with the UCF dataset.
+	Essentially this implements a training method based 
+	on the specific dataset being used (UCF-101).
+	'''
+	
 	def __init__(self, joblist):
 		self.vid_rows = 128
 		self.vid_cols = 128
@@ -421,6 +445,12 @@ class UCF_VGAN(object):
 
 
 	def save_gifs(self, save2file=False, fake=True, samples=16, noise=None, step=0):
+		'''
+		The GIF-saving processes has been hardcoded in the single_stream model. 
+		'''
+				'''
+		The GIF-saving processes has been hardcoded in the single_stream model. 
+		'''
 		pass
 
 class data_loader(object):
@@ -451,22 +481,30 @@ class data_loader(object):
 
 if __name__ == '__main__':
 	
-	
+	# give the jobs list
 	jobslist = "makeup.txt"
+	
+	# instantiate the model
 	ucf_vgan = UCF_VGAN(jobslist)
 	print('Model instantiated...')
+	
+	# initialize the timer
 	timer = ElapsedTimer()
+	
+	# train the model
 	ucf_vgan.train(train_steps=1, batch_size=8, save_interval=1)
 	timer.elapsed_time()
+	
+	# save some results
 	ucf_vgan.save_gifs()
-	ucf_vgan.generator.load_weights('checkpoint')
-	static_noise = np.random.rand(1, 1, 1, 100)
+	ucf_vgan.generator.load_weights('checkpoint')	# load the saved model
+	static_noise = np.random.rand(1, 1, 1, 100)	# generate noise for sampling	
 	video_noise = np.expand_dims(static_noise, 2)
-	out = ucf_vgan.generator.predict(video_noise)
+	out = ucf_vgan.generator.predict(video_noise)	# sample
 	print(out.shape)
 	num_frames = out.shape[3]
 
-	gif_frame_list = []
+	gif_frame_list = []				# save to gif
 			
 	for i in range(num_frames):
 		frame = imageio.imwrite('frame.jpg', np.squeeze(out)[:,:,i,:])
