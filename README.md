@@ -1,4 +1,5 @@
-# Clifford_Fitzpatrick_CVGANCode Repository for Conditional Video Adversarial Network
+# Clifford_Fitzpatrick_CVGAN
+Code Repository for Conditional Video Adversarial Network
  Project for EC500 Spring 2017 Final Project
 
 ## Scripts in Repository
