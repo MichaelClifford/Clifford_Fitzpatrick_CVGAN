@@ -448,7 +448,7 @@ class UCF_VGAN(object):
 		'''
 		The GIF-saving processes has been hardcoded in the single_stream model. 
 		'''
-				'''
+		'''
 		The GIF-saving processes has been hardcoded in the single_stream model. 
 		'''
 		pass
