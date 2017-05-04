@@ -20,6 +20,9 @@ import tensorflow as tf
 
 
 class ElapsedTimer(object):
+	'''
+	This implements a timer to keep track of training time.
+	'''
 	def __init__(self):
 		self.start_time = time.time()
 	def elapsed(self,sec):
@@ -33,6 +36,9 @@ class ElapsedTimer(object):
 		print("Elapsed: %s " % self.elapsed(time.time() - self.start_time) )
 
 class VGAN(object):
+	'''
+	This class implements the generator, discriminator, and the GAN networks, independent of dataset.
+	'''
 	def __init__(self, vid_rows=64, vid_cols=64, num_frames=32, channels=3):
 		self.vid_rows = vid_rows
 		self.vid_cols = vid_cols
@@ -45,6 +51,11 @@ class VGAN(object):
 		self.input_shape = (self.vid_rows, self.vid_cols, self.num_frames, self.channels)
 
 	def discriminator(self):
+		'''
+		This is the discriminator. 
+		It's a 5 layer 3dconvolutional binary classifier 
+		with batch normalization and leaky relu activations.
+		'''
 		if self.D:
 			return self.D
 
@@ -111,6 +122,11 @@ class VGAN(object):
 
 
 	def generator(self):
+		'''
+		This is the constructor of the generator. It combines the _video() stream
+		and the _static() streams with the _mask(). It uses the helper function _gen_net()
+		because the foreground (video) stream forks before completion.
+		'''
 		if self.G:
 			return self.G
 			
@@ -128,6 +144,9 @@ class VGAN(object):
 
 
 	def _static(self):
+		'''
+		The background stream. It learns a static background of the video.
+		'''
 		static = Sequential()
 
 		# First layer
@@ -187,6 +206,9 @@ class VGAN(object):
 		return static
 
 	def _video(self):
+		'''
+		The foreground stream. It learns the dynamics in the foreground.
+		'''
 		video = Sequential()
 		video.add(Deconvolution3D(filters=512,output_shape =(None,4,4,2,512),
 							kernel_size=(4,4,2),
@@ -225,6 +247,9 @@ class VGAN(object):
 		return video
 
 	def _gen_net(self,video):
+		''' 
+		Implements the last convolution for the foreground
+		'''
 		gen_net = Sequential()
 		gen_net.add(video)
 		gen_net.add(Deconvolution3D(filters=3, 
@@ -281,6 +306,9 @@ class VGAN(object):
 
 
 	def discriminator_model(self):
+		'''
+		Adds optimization to discriminator.
+		'''
 		if self.DM:
 			return self.DM
 		#optimizer = RMSprop(lr=0.0008, clipvalue=1.0, decay=6e-8)
@@ -293,6 +321,9 @@ class VGAN(object):
 
 
 	def adversarial_model(self):
+		'''
+		Creates the GAN network, adds optimization.
+		'''
 		if self.AM:
 			return self.AM
 		#optimizer = RMSprop(lr=0.0004, clipvalue=1.0, decay=3e-8)
@@ -303,6 +334,12 @@ class VGAN(object):
 		return self.AM
 
 class UCF_VGAN(object):
+	'''
+	Uses the adversarial model with the UCF dataset.
+	Essentially this implements a training method based 
+	on the specific dataset being used (UCF-101).
+	'''
+	
 	def __init__(self, joblist):
 		self.vid_rows = 128
 		self.vid_cols = 128
@@ -393,9 +430,16 @@ class UCF_VGAN(object):
 						noise=noise_input, step=(i+1))
 
 	def save_gifs(self, save2file=False, fake=True, samples=16, noise=None, step=0):
+		'''
+		The GIF-saving processes has been hardcoded in the single_stream model. 
+		'''
+		
 		pass
 
 class data_loader(object):
+	'''
+	Serves up data from the dataset based on a joblist of paths to the data.
+	'''
 	def __init__(self, joblist):
 		
 		self.joblist = joblist
