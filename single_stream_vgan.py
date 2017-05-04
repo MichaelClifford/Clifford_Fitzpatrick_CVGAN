@@ -404,7 +404,7 @@ class UCF_VGAN(object):
 				if (i+1)%save_interval==0:
 					#self.plot_images(save2file=True, samples=noise_input.shape[0],\
 						#noise=noise_input, step=(i+1))
-					self.generator.save_weights('checkpoint'+str(i))
+					self.generator.save_weights('checkpoint')
 					print('saving generator weights')
 				
 			
